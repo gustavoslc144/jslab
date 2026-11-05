@@ -7,7 +7,32 @@ const lista = document.querySelector("#lista-pedidos");
 titulo.textContent = "Pedido PS-1042";
 
 artigo.append(titulo);
-lista.append(artigo)*/
+lista.append(artigo)
+
+[feat/events]
+const botao = document.querySelector("#botao-teste");
+
+botao.addEventListener(
+    "click",
+    event => {
+        console.log(event);
+    }
+);*/
+/*const lista = document.querySelector("#lista-pedidos");
+lista.addEventListener(
+    "click",
+    event => {
+        const botao = event.target.closest("[data-acao]");
+        if (!botao) {
+            return;
+        }
+
+        console.log(botao.dataset);
+    }
+);*/
+const campoBusca = document.querySelector("#campo-busca");
+const filtroStatus = document.querySelector("#filtro-status");
+const ordenacao = document.querySelector("#ordenacao");
 
 function formatarMoeda(valor) {
     return new Intl.NumberFormat("pt-BR", {
@@ -37,13 +62,19 @@ function criarCardPedido(pedido) {
     const valor = document.createElement("p");
     valor.textContent = `Valor: ${formatarMoeda(pedido.valor)}`;
 
+    const botao = document.createElement("button");
+    botao.textContent = "Ver detalhes";
+    botao.dataset.id = pedido.id;
+    botao.dataset.acao = "detalhes";
+
     artigo.append(
         titulo,
         cliente,
         categoria,
         prioridade,
         status,
-        valor
+        valor,
+        botao
     );
 
     return artigo
@@ -66,4 +97,53 @@ function renderizarPedidos(listaPedidos) {
     });
 }
 
-renderizarPedidos(pedidos);
+function pesquisarPedidos(termo) {
+    const pesquisa = termo.trim().toLowerCase();
+
+    return pedidos.filter(pedido => {
+        return (
+            pedido.cliente.toLowerCase().includes(pesquisa) ||
+            pedido.categoria.toLowerCase().includes(pesquisa) ||
+            String(pedido.id).includes(pesquisa)
+        );
+    });
+}
+
+function atualizarVisualizacao() {
+    // 1. Obter Critérios
+    const termo = campoBusca.value;
+    const status = filtroStatus.value;
+    const criterio = ordenacao.value;
+
+    // 2. Aplicar Pesquisa
+    let resultado = pesquisarPedidos(termo);
+
+    // 3. Aplicar Filtro
+    if (status !== "todos") {
+        resultado = resultado.filter(pedido => {
+            return pedido.status === status;
+        });
+    }
+
+    // 4. Aplicar Ordenação
+    if (criterio === "cliente") {
+        resultado.sort((a,b) => {
+            return a.cliente.localeCompare(b.cliente, "pt-BR");
+        });
+    } else if (criterio === "valor-crescente") {
+        resultado.sort((a,b) => a.valor - b.valor);
+    } else if (criterio === "valor-decrescente") {
+        resultado.sort((a,b) => b.valor - a.valor);
+    }
+
+    // 5. Renderizar Resultado
+    renderizarPedidos(resultado);
+}
+
+// Eventos
+campoBusca.addEventListener("input", atualizarVisualizacao);
+filtroStatus.addEventListener("change", atualizarVisualizacao);
+ordenacao.addEventListener("change", atualizarVisualizacao);
+
+// Renderização inicial
+atualizarVisualizacao();
