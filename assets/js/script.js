@@ -1,35 +1,3 @@
-console.log("JavaScript carregado com sucesso!");
-
-/*const artigo = document.createElement("article");
-const titulo = document.createElement("h3");
-const lista = document.querySelector("#lista-pedidos");
-
-titulo.textContent = "Pedido PS-1042";
-
-artigo.append(titulo);
-lista.append(artigo)
-
-[feat/events]
-const botao = document.querySelector("#botao-teste");
-
-botao.addEventListener(
-    "click",
-    event => {
-        console.log(event);
-    }
-);*/
-/*const lista = document.querySelector("#lista-pedidos");
-lista.addEventListener(
-    "click",
-    event => {
-        const botao = event.target.closest("[data-acao]");
-        if (!botao) {
-            return;
-        }
-
-        console.log(botao.dataset);
-    }
-);*/
 const campoBusca = document.querySelector("#campo-busca");
 const filtroStatus = document.querySelector("#filtro-status");
 const ordenacao = document.querySelector("#ordenacao");
@@ -62,10 +30,9 @@ function criarCardPedido(pedido) {
     const valor = document.createElement("p");
     valor.textContent = `Valor: ${formatarMoeda(pedido.valor)}`;
 
-    const botao = document.createElement("button");
-    botao.textContent = "Ver detalhes";
-    botao.dataset.id = pedido.id;
-    botao.dataset.acao = "detalhes";
+    const link = document.createElement("a");
+    link.textContent = "Ver detalhes";
+    link.href = `detalhes.html?id=${pedido.id}`;
 
     artigo.append(
         titulo,
@@ -74,7 +41,7 @@ function criarCardPedido(pedido) {
         prioridade,
         status,
         valor,
-        botao
+        link
     );
 
     return artigo
